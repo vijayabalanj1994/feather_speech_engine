@@ -1,24 +1,65 @@
 version: "3.1"
 
 slots:
-  recipient:
+  # slots related to user's mood
+  mood_is_good:
+    type: bool
+    mappings:
+      - type: from_llm
+  poor_mood_cause:
     type: text
     mappings:
       - type: from_llm
-  amount:
-    type: float
+  # slots related to user's appetite
+  appetite_is_good:
+    type: bool
+    mappings:
+      - type: from_llm
+  poor_appetite_cause:
+    type: text
+    mappings:
+      - type: from_llm
+  # slots related to user's sleep
+  sleep_is_good:
+    type: bool
+    mappings:
+      - type: from_llm
+  poor_sleep_cause:
+    type: text
     mappings:
       - type: from_llm
 
 responses:
-  utter_ask_recipient:
-    - text: "Who would you like to send money to?"
 
-  utter_ask_amount:
-    - text: "How much money would you like to send?"
+  utter_greet:
+    - text: "Hey there!"
 
-  utter_transfer_complete:
-    - text: "All done. {amount} has been sent to {recipient}."
+  utter_ask_mood_is_good:
+    - text: "How are you feeling today?"
+
+  utter_ask_poor_mood_cause:
+    - text: "I see you've been feeling poor. Can you tell me more about it?"
+
+  utter_ask_appetite_is_good:
+    - text: "How's your appetite today?"
+
+  utter_ask_poor_appetite_cause:
+    - text: "Why do you think your appetite has been poor?"
+
+  utter_ask_sleep_is_good:
+    - text: "How did you sleep last night?"
+
+  utter_ask_poor_sleep_cause:
+    - text: "Why do you think your sleep has been poor?"
+
+  utter_sorry:
+    - text: "I'm sorry to hear that. Let's see what we can do."
+
+  utter_great:
+    - text: "That's great to hear!"
+
+  utter_goodbye:
+    - text: "Thanks for sharing. We'll catch up later. Take care!"
 
   utter_free_chitchat_response:
     - text: "placeholder"
@@ -33,3 +74,6 @@ responses:
           {{history}}
           {{current_input}}
           Suggested AI Response:
+
+actions:
+  - action_summarize_user_state

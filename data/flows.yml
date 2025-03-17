@@ -1,8 +1,82 @@
 flows:
-  transfer_money:
-    description: Help users send money to friends and family.
+  say_hello:
+    description: Greet the user.
     steps:
-      - collect: recipient
-      - collect: amount
-        description: the number of US dollars to send
-      - action: utter_transfer_complete
+      - action: utter_greet
+      - link: mood_check
+
+  mood_check:
+    description: Ask the user how they are feeling and set 'mood_is_good' based on context.
+    steps:
+      - collect: mood_is_good
+        reset_after_flow_ends: false
+        description: The slot 'mood_is_good' is set to true if the user's utterance indicates that their mood is good based on the context; otherwise, it is set to false.
+        next:
+          - if: not slots.mood_is_good
+            then:
+              - link: poor_mood_followup
+          - else:
+              - action: utter_great
+              - link: appetite_check
+
+  poor_mood_followup:
+    description: Inquire about the cause of the user's poor mood.
+    steps:
+      - collect: poor_mood_cause
+        reset_after_flow_ends: false
+        description: The cause of the user's poor mood.
+      - action: utter_sorry
+      - link: appetite_check
+
+  appetite_check:
+    description: Ask the user about their appetite and set 'appetite_is_good' based on context.
+    steps:
+      - collect: appetite_is_good
+        reset_after_flow_ends: false
+        description: The slot 'appetite_is_good' is set to true if the user's utterance indicates that their appetite is good based on the context; otherwise, it is set to false.
+        next:
+          - if: not slots.appetite_is_good
+            then:
+              - link: poor_appetite_followup
+          - else:
+              - action: utter_great
+              - link: sleep_check
+
+  poor_appetite_followup:
+    description: Ask the user what caused their poor appetite.
+    steps:
+      - collect: poor_appetite_cause
+        reset_after_flow_ends: false
+        description: The cause of the user's poor appetite.
+      - action: utter_sorry
+      - link: sleep_check
+
+  sleep_check:
+    description: Ask the user about their sleep quality and set 'sleep_is_good' based on context.
+    steps:
+      - collect: sleep_is_good
+        reset_after_flow_ends: false
+        description: The slot 'sleep_is_good' is set to true if the user's utterance indicates that their sleep is good based on the context; otherwise, it is set to false.
+        next:
+          - if: not slots.sleep_is_good
+            then:
+              - link: poor_sleep_followup
+          - else:
+              - action: utter_great
+              - link: check_wrap_up
+
+  poor_sleep_followup:
+    description: Ask the user what caused their poor sleep.
+    steps:
+      - collect: poor_sleep_cause
+        reset_after_flow_ends: false
+        description: The cause of the user's poor sleep.
+      - action: utter_sorry
+      - link: check_wrap_up
+
+  check_wrap_up:
+    description: Summarize the user’s mood, appetite, and sleep. Then the bot stops.
+    steps:
+      - action: action_summarize_user_state
+      - action: utter_goodbye
+        next: END

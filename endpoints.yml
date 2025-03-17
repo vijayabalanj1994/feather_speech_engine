@@ -44,6 +44,7 @@ action_endpoint:
 # Allow rephrasing of responses using a Rasa-hosted model
 nlg:
   type: rephrase
+  rephrase_all: true
   llm:
     model_group: feather_azure_deployment
 
