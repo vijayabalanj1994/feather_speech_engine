@@ -1,0 +1,27 @@
+{
+  "prompt": null,
+  "prompt_template": null,
+  "user_input": null,
+  "llm": {
+    "id": "feather_azure_deployment",
+    "models": [
+      {
+        "provider": "azure",
+        "deployment": "gpt-4",
+        "api_base": "https://openai-macs-prime-001.openai.azure.com",
+        "api_version": "2024-10-21",
+        "api_key": "${FEATHER_AZURE_API_KEY}"
+      }
+    ]
+  },
+  "flow_retrieval": {
+    "embeddings": {
+      "provider": "openai",
+      "model": "text-embedding-ada-002"
+    },
+    "num_flows": 20,
+    "turns_to_embed": 1,
+    "should_embed_slots": true,
+    "active": false
+  }
+}
