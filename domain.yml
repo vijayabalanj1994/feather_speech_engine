@@ -1,30 +1,18 @@
 version: "3.1"
 
 slots:
-  # slots related to user's mood
-  mood_is_good:
-    type: bool
+  mood_score:
+    type: categorical
+    values:
+      - 5
+      - 4
+      - 3
+      - 2
+      - 1
     mappings:
       - type: from_llm
-  poor_mood_cause:
-    type: text
-    mappings:
-      - type: from_llm
-  # slots related to user's appetite
-  appetite_is_good:
-    type: bool
-    mappings:
-      - type: from_llm
-  poor_appetite_cause:
-    type: text
-    mappings:
-      - type: from_llm
-  # slots related to user's sleep
-  sleep_is_good:
-    type: bool
-    mappings:
-      - type: from_llm
-  poor_sleep_cause:
+
+  poor_mood_reason:
     type: text
     mappings:
       - type: from_llm
@@ -33,47 +21,37 @@ responses:
 
   utter_greet:
     - text: "Hey there!"
+    - text: "Hi! It’s great to chat with you."
+    - text: "Hello! I’m here to check in on you. Let’s get started."
 
-  utter_ask_mood_is_good:
-    - text: "How are you feeling today?"
+  utter_good-bye:
+    - text: "It was great talking with you! Take care and have a wonderful day!"
+    - text: "Thanks for checking in! Remember, I’m always here whenever you need me."
+    - text: "I appreciate our chat! Stay well and talk to you soon!"
 
-  utter_ask_poor_mood_cause:
-    - text: "I see you've been feeling poor. Can you tell me more about it?"
-
-  utter_ask_appetite_is_good:
-    - text: "How's your appetite today?"
-
-  utter_ask_poor_appetite_cause:
-    - text: "Why do you think your appetite has been poor?"
-
-  utter_ask_sleep_is_good:
-    - text: "How did you sleep last night?"
-
-  utter_ask_poor_sleep_cause:
-    - text: "Why do you think your sleep has been poor?"
-
-  utter_sorry:
-    - text: "I'm sorry to hear that. Let's see what we can do."
+  utter_ask_mood_score:
+    - text: "How has your mood been today?"
+    - text: "I’d love to hear how you’re feeling right now."
+    - text: "How have you been doing emotionally today?"
+    - text: "Tell me, how’s your day going so far?"
 
   utter_great:
-    - text: "That's great to hear!"
+    - text: "That's wonderful to hear! I'm glad you're feeling this way."
+    - text: "Great! It’s always nice to have a positive day."
+    - text: "That’s awesome! Keep enjoying your day."
 
-  utter_goodbye:
-    - text: "Thanks for sharing. We'll catch up later. Take care!"
+  utter_ask_poor_mood_reason:
+    - text: "I'm sorry to hear that. Would you like to share what’s on your mind?"
+    - text: "That sounds tough. If you feel like talking about it, I'm here to listen."
+    - text: "I understand. Do you want to tell me more about what's making you feel this way?"
 
-  utter_free_chitchat_response:
-    - text: "placeholder"
+  utter_empathy:
+    - text: "That sounds really difficult. I appreciate you sharing that with me."
+    - text: "I’m really sorry you’re feeling this way. I hope things get better soon."
+    - text: "I hear you. That must be tough to deal with, but you're not alone."
+
+  utter_scores:
+    - text: "mood_score:- {mood_score}"
       metadata:
-        rephrase: True
-        rephrase_prompt: |
-          The following is a conversation with an AI assistant built with Rasa.
-          The assistant can help the user transfer money.
-          The assistant is helpful, creative, clever, and very friendly.
-          The user is making small talk, and the assistant should respond, keeping things light.
-          Context / previous conversation with the user:
-          {{history}}
-          {{current_input}}
-          Suggested AI Response:
+        rephrase: False
 
-actions:
-  - action_summarize_user_state

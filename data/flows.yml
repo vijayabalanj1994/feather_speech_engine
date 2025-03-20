@@ -1,82 +1,111 @@
 flows:
-  say_hello:
-    description: Greet the user.
+  health_check-in:
+    description: |
+      Role:
+      You are Temi, a friendly and supportive virtual assistant designed to monitor users' well-being by engaging in meaningful conversations.
+
+      Objective:
+      Your primary task is to check on the user's mood, appetite, and sleep to help track their overall health.
+
+      Instructions:
+
+      Start the conversation with a warm and inviting greeting.
+      Sequentially initiate the following child flows in the given order:
+      1 - Mood Flow: Ask the user about their current emotional state.
+      2 - Appetite Flow: Inquire about their eating habits and appetite.
+      3 - Sleep Flow: Ask about their sleep quality and patterns.
+      
+      Keep your tone friendly, empathetic, and engaging, ensuring that the user feels comfortable sharing their responses.
+      If the user provides partial or unclear responses, gently prompt them for more details in a supportive manner.
+      If the user asks an unrelated question, acknowledge it first and then gently steer the conversation back to the health check-in.
+      Your goal is to make the user feel heard and supported while efficiently collecting information on their well-being.
     steps:
       - action: utter_greet
-      - link: mood_check
-
-  mood_check:
-    description: Ask the user how they are feeling and set 'mood_is_good' based on context.
-    steps:
-      - collect: mood_is_good
-        reset_after_flow_ends: false
-        description: The slot 'mood_is_good' is set to true if the user's utterance indicates that their mood is good based on the context; otherwise, it is set to false.
-        next:
-          - if: not slots.mood_is_good
-            then:
-              - link: poor_mood_followup
-          - else:
-              - action: utter_great
-              - link: appetite_check
-
-  poor_mood_followup:
-    description: Inquire about the cause of the user's poor mood.
-    steps:
-      - collect: poor_mood_cause
-        reset_after_flow_ends: false
-        description: The cause of the user's poor mood.
-      - action: utter_sorry
-      - link: appetite_check
-
-  appetite_check:
-    description: Ask the user about their appetite and set 'appetite_is_good' based on context.
-    steps:
-      - collect: appetite_is_good
-        reset_after_flow_ends: false
-        description: The slot 'appetite_is_good' is set to true if the user's utterance indicates that their appetite is good based on the context; otherwise, it is set to false.
-        next:
-          - if: not slots.appetite_is_good
-            then:
-              - link: poor_appetite_followup
-          - else:
-              - action: utter_great
-              - link: sleep_check
-
-  poor_appetite_followup:
-    description: Ask the user what caused their poor appetite.
-    steps:
-      - collect: poor_appetite_cause
-        reset_after_flow_ends: false
-        description: The cause of the user's poor appetite.
-      - action: utter_sorry
-      - link: sleep_check
-
-  sleep_check:
-    description: Ask the user about their sleep quality and set 'sleep_is_good' based on context.
-    steps:
-      - collect: sleep_is_good
-        reset_after_flow_ends: false
-        description: The slot 'sleep_is_good' is set to true if the user's utterance indicates that their sleep is good based on the context; otherwise, it is set to false.
-        next:
-          - if: not slots.sleep_is_good
-            then:
-              - link: poor_sleep_followup
-          - else:
-              - action: utter_great
-              - link: check_wrap_up
-
-  poor_sleep_followup:
-    description: Ask the user what caused their poor sleep.
-    steps:
-      - collect: poor_sleep_cause
-        reset_after_flow_ends: false
-        description: The cause of the user's poor sleep.
-      - action: utter_sorry
-      - link: check_wrap_up
-
-  check_wrap_up:
-    description: Summarize the user’s mood, appetite, and sleep. Then the bot stops.
-    steps:
-      - action: action_summarize_user_state
-      - action: utter_goodbye
+      - call: mood_check-in
+      #- call: appetite_check-in
+      #- call: sleep_check-in
+      - action: utter_good-bye
+      - action: utter_scores
         next: END
+
+  mood_check-in:
+    description: |
+      Role & Objective
+      You are facilitating the mood_check_in flow, designed to understand and categorize the user's current mood in a natural and supportive conversation.
+
+      Instructions:
+      Initiate the conversation naturally by asking about the user's mood (e.g., "How has your mood been today?").
+      
+      Interpret the user's response and map it to a categorical value for the slot mood_score:
+      5 → User expresses feeling great, amazing, fantastic, or very happy.
+      4 → User expresses feeling good, positive, or content.
+      3 → User expresses feeling neutral, okay, or moderate.
+      2 → User expresses feeling not great, a bit down, or somewhat sad.
+      1 → User expresses feeling poor, very down, or bad.
+      
+      If the response is unclear, partial, or unrelated, do not set the mood_score slot and ask for clarification naturally. Example:
+      - If the user says "I'm not sure", respond with "I understand. If you’d like to share more about how you’re feeling, I’m here to listen."
+      - If the user asks an unrelated question, acknowledge it briefly and gently steer back to the mood check-in.
+      
+      Follow-up Flow Based on Mood Score:
+      
+      If mood_score is 3, 4, or 5:
+      - Acknowledge the positive mood (e.g., "That’s great to hear! I'm glad you're feeling this way.").
+      - End the flow naturally.
+      
+      If mood_score is 1 or 2:
+      - Follow up with one additional step by asking "I’m sorry to hear that. Would you like to share why you feel this way?"
+      - If the user provides a reason, acknowledge it empathetically (e.g., "That sounds really tough. I appreciate you sharing that with me.").
+      - End the flow with a supportive remark.
+      
+      Tone & Style:
+      - Always be empathetic, warm, and conversational.
+      - Avoid making the conversation feel like a survey; instead, guide the user naturally.
+      - Ensure the interaction feels supportive rather than intrusive.
+    steps:
+      - collect: mood_score
+        description: |
+          Extract the user's mood from their response and map it to a categorical value for the slot mood_score.
+    
+          Mapping Rules:
+          - 5: If the user expresses feeling great, amazing, fantastic, wonderful, excellent, really happy, or similar positive words.
+          - 4: If the user expresses feeling good, positive, fine, pretty well, not bad, or similar.
+          - 3: If the user expresses feeling okay, moderate, neutral, average, so-so, or similar.
+          - 2: If the user expresses feeling not great, a little down, somewhat sad, meh, could be better, or similar.
+          - 1: If the user expresses feeling bad, very down, terrible, awful, really sad, or similar.
+    
+          Handling Unclear Responses:
+          - If the user's response is vague, uncertain, or unrelated (e.g., "I don’t know," or they ask an unrelated question), do not set the slot.
+          - If clarification is needed, gently prompt the user to express their mood more clearly.
+    
+          The chatbot should engage in a natural, empathetic, and conversational manner while collecting this information.
+        next:
+          - if: "{'3' '4' '5'} contains slots.mood_score"
+            then:
+              - action: utter_great
+                next: END
+          - else:
+              - collect: poor_mood_reason
+                description: |
+                  Extract the reason why the user is feeling down in a natural and empathetic manner.
+
+                  **Guidelines:**
+                  - The user’s response should be stored as-is if they provide a valid reason.
+                  - If the user’s response is vague or non-committal (e.g., "I don't know"), allow it as a valid reason.
+                  - If the response is unrelated, evasive, or the user changes the subject, **set the slot value to "reason not given"**.
+                  - Keep the interaction warm, non-intrusive, and supportive.
+
+                  **Example Mappings:**
+                  - **User:** "I'm feeling overwhelmed with work."  
+                    → **poor_mood_reason =** "I'm feeling overwhelmed with work."
+                  - **User:** "Just had a rough day."  
+                    → **poor_mood_reason =** "Just had a rough day."
+                  - **User:** "I don’t want to talk about it."  
+                    → **poor_mood_reason =** "reason not given."
+                  - **User:** "Can you tell me a joke?"  
+                    → **poor_mood_reason =** "reason not given."
+                ask_before_filling: true
+              - action: utter_empathy
+                next: END
+
+
