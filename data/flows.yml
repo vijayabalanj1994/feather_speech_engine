@@ -22,7 +22,7 @@ flows:
     steps:
       - action: utter_greet
       - call: mood_check-in
-      #- call: appetite_check-in
+      - call: appetite_check-in
       #- call: sleep_check-in
       - action: utter_good-bye
       - action: utter_scores
@@ -82,30 +82,89 @@ flows:
         next:
           - if: "{'3' '4' '5'} contains slots.mood_score"
             then:
-              - action: utter_great
+              - action: utter_mood_great
                 next: END
           - else:
               - collect: poor_mood_reason
                 description: |
                   Extract the reason why the user is feeling down in a natural and empathetic manner.
 
-                  **Guidelines:**
+                  Guidelines:
                   - The user’s response should be stored as-is if they provide a valid reason.
                   - If the user’s response is vague or non-committal (e.g., "I don't know"), allow it as a valid reason.
-                  - If the response is unrelated, evasive, or the user changes the subject, **set the slot value to "reason not given"**.
+                  - If the response is unrelated, evasive, or the user changes the subject, set the slot value to "reason not given"**.
                   - Keep the interaction warm, non-intrusive, and supportive.
-
-                  **Example Mappings:**
-                  - **User:** "I'm feeling overwhelmed with work."  
-                    → **poor_mood_reason =** "I'm feeling overwhelmed with work."
-                  - **User:** "Just had a rough day."  
-                    → **poor_mood_reason =** "Just had a rough day."
-                  - **User:** "I don’t want to talk about it."  
-                    → **poor_mood_reason =** "reason not given."
-                  - **User:** "Can you tell me a joke?"  
-                    → **poor_mood_reason =** "reason not given."
                 ask_before_filling: true
-              - action: utter_empathy
+              - action: utter_mood_empathy
                 next: END
 
 
+  appetite_check-in:
+    description: |
+      Role & Objective
+      You are facilitating the appetite_check-in flow, designed to understand and categorize the user's current appetite in a natural and supportive conversation.
+
+      Instructions:
+      Initiate the conversation naturally by asking about the user's appetite or eating habits (e.g., "How has your appetite been lately?" or "Have you been eating well these days?").
+      
+      Interpret the user's response and map it to a categorical value for the slot appetite_score:
+      5 → User expresses excellent appetite (e.g., "Eating great", "Very hungry and eating well").
+      4 → User expresses good appetite (e.g., "Eating okay", "Generally fine").
+      3 → User expresses neutral/moderate appetite (e.g., "So-so", "Could be better", "Not bad").
+      2 → User expresses low appetite (e.g., "Not eating much", "Not really hungry", "Skipping meals").
+      1 → User expresses very poor appetite (e.g., "Barely eating", "No appetite", "Forcing myself to eat")
+      
+      If the response is unclear, partial, or unrelated, do not set the appetite_score slot and ask for clarification naturally. Example:
+      - If the user says "I'm not sure", respond with "That's okay. If you'd like to talk about how your eating habits have been lately, I'm here to listen"
+      - If the user asks an unrelated question, acknowledge it briefly and gently steer back to the mood check-in.
+      
+      Follow-up Flow Based on appetite_score:
+      
+      If appetite_score is 3, 4, or 5:
+      - Acknowledge the positive appetite with a warm and supportive message (e.g., "That’s good to hear! Eating well is important.").
+      - End the flow naturally.
+      
+      If appetite_score is 1 or 2:
+      - Follow up with one additional step by asking "I'm sorry to hear that. Would you like to share why your appetite has been low?"
+      - If the user provides a reason, acknowledge it empathetically (e.g., "That sounds really tough. I appreciate you sharing that with me.").
+      - End the flow with a supportive remark.
+      
+      Tone & Style:
+      - Always be empathetic, warm, and conversational.
+      - Avoid making the conversation feel like a survey; instead, guide the user naturally.
+      - Ensure the interaction feels supportive rather than intrusive.
+    steps:
+      - collect: appetite_score
+        description: |
+          Extract the user's appetite status and map it to a categorical value for the slot appetite_score.
+    
+          Mapping Rules:
+          - 5 → User expresses excellent appetite (e.g., "Eating great", "Very hungry and eating well").
+          - 4 → User expresses good appetite (e.g., "Eating okay", "Generally fine").
+          - 3 → User expresses neutral/moderate appetite (e.g., "So-so", "Could be better", "Not bad").
+          - 2 → User expresses low appetite (e.g., "Not eating much", "Not really hungry", "Skipping meals").
+          - 1 → User expresses very poor appetite (e.g., "Barely eating", "No appetite", "Forcing myself to eat")
+    
+          Handling Unclear Responses:
+          - If the user's response is vague, uncertain, or unrelated (e.g., "I don’t know," or they ask an unrelated question), do not set the appetite_score slot.
+          - If clarification is needed, gently prompt the user to express how their appetite has been.
+    
+          The chatbot should engage in a natural, empathetic, and conversational manner while collecting this information.
+        next:
+          - if: "{'3' '4' '5'} contains slots.appetite_score"
+            then:
+              - action: utter_appetite_great
+                next: END
+          - else:
+              - collect: poor_appetite_reason
+                description: |
+                  Extract the reason why the user’s appetite has been low in a natural and empathetic manner.
+
+                  Guidelines:
+                  - The user’s response should be stored as-is if they provide a valid reason related to reduced appetite (e.g., stress, illness, emotional state).
+                  - If the user’s response is vague or non-committal (e.g., "I don't know"), allow it as a valid reason.
+                  - If the response is unrelated, evasive, or the user changes the subject, set the slot value to "reason not given".
+                  - Keep the interaction warm, non-intrusive, and supportive, ensuring the user feels comfortable sharing if they choose to.
+                ask_before_filling: true
+              - action: utter_appetite_empathy
+                next: END

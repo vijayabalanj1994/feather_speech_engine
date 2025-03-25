@@ -12,7 +12,23 @@ slots:
     mappings:
       - type: from_llm
 
+  appetite_score:
+    type: categorical
+    values:
+      - 5
+      - 4
+      - 3
+      - 2
+      - 1
+    mappings:
+      - type: from_llm
+
   poor_mood_reason:
+    type: text
+    mappings:
+      - type: from_llm
+
+  poor_appetite_reason:
     type: text
     mappings:
       - type: from_llm
@@ -35,23 +51,44 @@ responses:
     - text: "How have you been doing emotionally today?"
     - text: "Tell me, how’s your day going so far?"
 
-  utter_great:
+  utter_ask_appetite_score:
+    - text: "How has your appetite been lately?"
+    - text: "Have you been eating well these days?"
+    - text: "How’s your appetite recently?"
+    - text: "Noticed any changes in your eating habits?"
+
+  utter_mood_great:
     - text: "That's wonderful to hear! I'm glad you're feeling this way."
     - text: "Great! It’s always nice to have a positive day."
     - text: "That’s awesome! Keep enjoying your day."
+
+  utter_appetite_great:
+    - text: "That’s good to hear! Eating well is important."
+    - text: "Great, I’m glad your appetite is doing okay."
+    - text: "Sounds like you're taking care of yourself!"
 
   utter_ask_poor_mood_reason:
     - text: "I'm sorry to hear that. Would you like to share what’s on your mind?"
     - text: "That sounds tough. If you feel like talking about it, I'm here to listen."
     - text: "I understand. Do you want to tell me more about what's making you feel this way?"
 
-  utter_empathy:
+  utter_ask_poor_appetite_reason:
+    - text: "I'm sorry to hear that. Is there a reason your appetite has been low?"
+    - text: "That must be tough. Would you like to share what's affecting your appetite?"
+    - text: "Anything in particular that’s making it hard to eat?"
+
+  utter_mood_empathy:
     - text: "That sounds really difficult. I appreciate you sharing that with me."
     - text: "I’m really sorry you’re feeling this way. I hope things get better soon."
     - text: "I hear you. That must be tough to deal with, but you're not alone."
 
+  utter_appetite_empathy:
+    - text: "Thanks for sharing. That can really take a toll on how you're feeling."
+    - text: "I appreciate you opening up. Hopefully things improve soon."
+    - text: "That sounds difficult. You're not alone, and I’m here for you."
+
   utter_scores:
-    - text: "mood_score:- {mood_score}"
+    - text: "mood_score:- {mood_score} \nappetite_score:- {appetite_score}"
       metadata:
         rephrase: False
 
