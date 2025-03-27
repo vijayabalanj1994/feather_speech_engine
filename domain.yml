@@ -23,12 +23,33 @@ slots:
     mappings:
       - type: from_llm
 
+  sleep_score:
+    type: categorical
+    values:
+      - 5
+      - 4
+      - 3
+      - 2
+      - 1
+    mappings:
+      - type: from_llm
+
   poor_mood_reason:
     type: text
     mappings:
       - type: from_llm
 
   poor_appetite_reason:
+    type: text
+    mappings:
+      - type: from_llm
+
+  poor_sleep_reason:
+    type: text
+    mappings:
+      - type: from_llm
+
+  anything_else:
     type: text
     mappings:
       - type: from_llm
@@ -57,6 +78,12 @@ responses:
     - text: "How’s your appetite recently?"
     - text: "Noticed any changes in your eating habits?"
 
+  utter_ask_sleep_score:
+    - text: "How have you been sleeping lately?"
+    - text: "Have you been getting enough rest recently?"
+    - text: "Noticed any changes in your sleep lately?"
+    - text: "How’s your sleep been these past few days?"
+
   utter_mood_great:
     - text: "That's wonderful to hear! I'm glad you're feeling this way."
     - text: "Great! It’s always nice to have a positive day."
@@ -66,6 +93,11 @@ responses:
     - text: "That’s good to hear! Eating well is important."
     - text: "Great, I’m glad your appetite is doing okay."
     - text: "Sounds like you're taking care of yourself!"
+
+  utter_sleep_great:
+    - text: "That’s great to hear! Getting good sleep makes a big difference."
+    - text: "I’m glad you're feeling rested!"
+    - text: "Awesome, sounds like your sleep has been on track."
 
   utter_ask_poor_mood_reason:
     - text: "I'm sorry to hear that. Would you like to share what’s on your mind?"
@@ -77,6 +109,11 @@ responses:
     - text: "That must be tough. Would you like to share what's affecting your appetite?"
     - text: "Anything in particular that’s making it hard to eat?"
 
+  utter_ask_poor_sleep_reason:
+    - text: "Sorry to hear that. Would you like to share what’s been affecting your sleep?"
+    - text: "I see. Is there something keeping you up at night?"
+    - text: "That must be hard. What’s been making sleep difficult for you?"
+
   utter_mood_empathy:
     - text: "That sounds really difficult. I appreciate you sharing that with me."
     - text: "I’m really sorry you’re feeling this way. I hope things get better soon."
@@ -87,8 +124,39 @@ responses:
     - text: "I appreciate you opening up. Hopefully things improve soon."
     - text: "That sounds difficult. You're not alone, and I’m here for you."
 
+  utter_sleep_empathy:
+    - text: "Thanks for sharing that with me. I know poor sleep can be really tough."
+    - text: "I hear you. That’s not easy, and I appreciate you opening up."
+    - text: "That sounds challenging. I hope things improve soon — I’m here for you."
+
+  utter_ask_anything_else:
+    - text: "That’s all for your health check-in. Is there anything else you’d like to talk about?"
+    - text: "I’ve finished checking in on your mood, appetite, and sleep. Would you like to share anything else?"
+    - text: "Thanks for chatting with me! Is there anything else on your mind?"
+
   utter_scores:
-    - text: "mood_score:- {mood_score} \nappetite_score:- {appetite_score}"
+    - text: "mood_score:- {mood_score} \nappetite_score:- {appetite_score} \nsleep_score:- {sleep_score}"
       metadata:
         rephrase: False
+
+  utter_free_chitchat_response:
+    - text: "placeholder"
+      metadata:
+        rephrase: True
+        rephrase_prompt: |
+          The following is a conversation with an AI assistant built with Rasa.
+          
+          Role:
+          You are Temi, a friendly and supportive virtual assistant designed to monitor users' well-being by engaging in meaningful conversations.
+    
+          Objective:
+          Your primary task is to check on the user's mood, appetite, and sleep to help track their overall health.
+          The assistant is helpful, creative, clever, and very friendly.
+          The user is making small talk, and the assistant should respond, keeping things light.
+          Context / previous conversation with the user:
+          {{history}}
+          {{current_input}}
+          
+          your response should be short and in a single sentence. Do not respond with leading questions.  
+          Suggested AI Response:
 

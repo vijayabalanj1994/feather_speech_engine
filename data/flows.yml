@@ -19,13 +19,15 @@ flows:
       If the user provides partial or unclear responses, gently prompt them for more details in a supportive manner.
       If the user asks an unrelated question, acknowledge it first and then gently steer the conversation back to the health check-in.
       Your goal is to make the user feel heard and supported while efficiently collecting information on their well-being.
+    persisted_slots:
+      - mood_score
+      - appetite_score
+      - sleep_score
     steps:
       - action: utter_greet
       - call: mood_check-in
       - call: appetite_check-in
-      #- call: sleep_check-in
-      - action: utter_good-bye
-      - action: utter_scores
+      - call: sleep_check-in
         next: END
 
   mood_check-in:
@@ -62,6 +64,7 @@ flows:
       - Always be empathetic, warm, and conversational.
       - Avoid making the conversation feel like a survey; instead, guide the user naturally.
       - Ensure the interaction feels supportive rather than intrusive.
+    if: False
     steps:
       - collect: mood_score
         description: |
@@ -133,6 +136,7 @@ flows:
       - Always be empathetic, warm, and conversational.
       - Avoid making the conversation feel like a survey; instead, guide the user naturally.
       - Ensure the interaction feels supportive rather than intrusive.
+    if: False
     steps:
       - collect: appetite_score
         description: |
@@ -167,4 +171,75 @@ flows:
                   - Keep the interaction warm, non-intrusive, and supportive, ensuring the user feels comfortable sharing if they choose to.
                 ask_before_filling: true
               - action: utter_appetite_empathy
+                next: END
+
+  sleep_check-in:
+    description: |
+      Role & Objective
+      You are facilitating the sleep_check-in flow, designed to understand and categorize the user's recent sleep quality in a natural and supportive conversation.
+
+      Instructions:
+      Initiate the conversation naturally by asking about the user's sleep habits (e.g., "How have you been sleeping lately?" or "Have you been getting enough rest recently?").
+      
+      Interpret the user's response and map it to a categorical value for the slot sleep_score:
+      5 → User expresses very good sleep (e.g., "Slept great", "Well rested", "Sleeping like a baby").
+      4 → User expresses good sleep (e.g., "Sleeping okay", "No major issues", "Restful").
+      3 → User expresses moderate sleep (e.g., "So-so", "Could be better", "Average sleep").
+      2 → User expresses poor sleep (e.g., "Not sleeping well", "Tired", "Restless nights").
+      1 → User expresses very poor sleep (e.g., "Barely sleeping", "Severe insomnia", "Completely exhausted").
+      
+      If the response is unclear, partial, or unrelated, do not set the mood_score slot and ask for clarification naturally. Example:
+      - If the user says "I'm not sure", respond with "That’s okay. If you’d like to share more about how your sleep has been lately, I’m here to listen.""
+      - If the user asks an unrelated question, acknowledge it briefly and gently steer back to the sleep check-in.
+      
+      Follow-up Flow Based on sleep_score:
+      
+      If sleep_score is 3, 4, or 5:
+      - Acknowledge the positive sleep quality with a warm and supportive message (e.g., "That’s great to hear! Getting good sleep makes a big difference.").
+      - End the flow naturally.
+      
+      If sleep_score is 1 or 2:
+      - Follow up with one additional step by asking "I'm sorry to hear that. Would you like to share why your sleep has been poor?"
+      - If the user provides a reason, acknowledge it empathetically (e.g., "That sounds really tough. I appreciate you sharing that with me.").
+      - End the flow with a supportive remark.
+      
+      Tone & Style:
+      - Always be empathetic, warm, and conversational.
+      - Avoid making the conversation feel like a survey; instead, guide the user naturally.
+      - Ensure the interaction feels supportive rather than intrusive.
+    if: False
+    steps:
+      - collect: sleep_score
+        description: |
+          Extract the user's sleep quality from their response and map it to a categorical value for the slot sleep_score.
+    
+          Mapping Rules:
+          - 5 → User expresses very good sleep (e.g., "Slept great", "Well rested", "Sleeping like a baby").
+          - 4 → User expresses good sleep (e.g., "Sleeping okay", "No major issues", "Restful").
+          - 3 → User expresses moderate sleep (e.g., "So-so", "Could be better", "Average sleep").
+          - 2 → User expresses poor sleep (e.g., "Not sleeping well", "Tired", "Restless nights").
+          - 1 → User expresses very poor sleep (e.g., "Barely sleeping", "Severe insomnia", "Completely exhausted").
+    
+          Handling Unclear Responses:
+          - If the user's response is vague, uncertain, or unrelated (e.g., "I don’t know," or they ask an unrelated question), do not set the sleep_score slot.
+          - If clarification is needed, gently prompt the user to describe how their sleep has been.
+    
+          The chatbot should engage in a natural, empathetic, and conversational manner while collecting this information.
+        next:
+          - if: "{'3' '4' '5'} contains slots.sleep_score"
+            then:
+              - action: utter_sleep_great
+                next: END
+          - else:
+              - collect: poor_sleep_reason
+                description: |
+                  Extract the reason why the user is experiencing poor sleep in a natural and empathetic manner.
+              
+                  Guidelines:
+                  - The user’s response should be stored as-is if they provide a valid reason (e.g., stress, anxiety, noise, overthinking, physical discomfort).
+                  - If the user’s response is vague or non-committal (e.g., "I don't know"), allow it as a valid reason.
+                  - If the response is unrelated, evasive, or the user changes the subject, set the slot value to **"reason not given"**.
+                  - Keep the interaction warm, non-intrusive, and supportive, making sure the user feels comfortable sharing.
+                ask_before_filling: true
+              - action: utter_sleep_empathy
                 next: END

@@ -1,0 +1,27 @@
+flows:
+  pattern_chitchat:
+    description: Conversation repair flow for off-topic interactions that won't disrupt the main conversation. should not respond to greetings or anything else for which there is a flow defined
+    name: pattern chitchat
+    steps:
+      - action: utter_free_chitchat_response
+  pattern_search:
+    description: Flow for handling knowledge-based questions
+    name: pattern search
+    steps:
+      - action: utter_free_chitchat_response
+
+  pattern_completed:
+    description: this flow ends the conversation with the user.
+    name: pattern completed
+    steps:
+      - collect: anything_else
+        description: |
+          Capture anything else the user would like to share after completing the health check-in.
+    
+          Guidelines:
+          - Store the user's response as-is, even if it's a simple thank you or unrelated message.
+          - If the user says "no", "that's all", or something similar, still store it (e.g., "nothing else", "no, thank you").
+          - Do not prompt the user further after this step.
+      - action: utter_good-bye
+      - action: utter_scores
+        next: END
